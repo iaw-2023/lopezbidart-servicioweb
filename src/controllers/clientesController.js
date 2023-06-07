@@ -43,7 +43,6 @@ const getClientesByEmail= (req, res) => {
   
 
 const postLogin= (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
 
@@ -66,7 +65,6 @@ const postLogin= (req, res) => {
 
 
 const addClientes = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
 
@@ -110,7 +108,6 @@ const removeCliente = (req, res) => {
 };
 
 const updateCliente = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
 
