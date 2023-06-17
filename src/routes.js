@@ -6,9 +6,11 @@ const coloresController= require('./controllers/coloresController');
 const clientesController= require('./controllers/clientesController');
 const pedidosController= require('./controllers/pedidosController');
 const detallesController= require('./controllers/detallesController');
-
-
+const pagoController= require("./controllers/pagoController");
 const router=Router();
+
+
+router.post("/payment", pagoController.postPago);
 
 /**
  * @swagger 

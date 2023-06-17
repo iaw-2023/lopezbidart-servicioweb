@@ -4,6 +4,7 @@ const queries= require('../queries/clientesQueries');
 const bcrypt = require("bcrypt");
 
 
+
 const getClientes= (req, res) => {
     pool.query(queries.getClientes, (error, results)=>{
         if (error) throw error;
@@ -35,7 +36,7 @@ const getClientesById= (req, res) => {
 
 const getClientesByEmail= (req, res) => {
     const email= req.params.param;
-    pool.query(queries.getClientesByEmail,[email], (error, results)=>{
+    pool.query(queries.getClientesByEmail,[email.toLowerCase()], (error, results)=>{
         if (error) throw error;
         res.status(200).json(results.rows);
     });
@@ -43,20 +44,21 @@ const getClientesByEmail= (req, res) => {
   
 
 const postLogin= (req, res) => {
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
+   res.setHeader('Access-Control-Allow-Headers', '*');
+   res.setHeader('Access-Control-Allow-Methods', '*');
 
     const {email, password } = req.body;
-         pool.query(queries.getClientesByEmail,[email], (error, results)=>{
-            if (error) throw error;
+
+    pool.query(queries.getClientesByEmail, [email.toLowerCase()], (error, results)=> {
+        if (error) throw error;
             if (!results.rows.length){
                 res.status(404).send('Email no registrado');
             }    
-            const cliente = results.rows[0];    
+            const cliente = results.rows[0];   
             return  bcrypt.compare(password, cliente.password).then(resul => {
                 if (resul == true ) return res.status(200).send({
-                    token: 'test123'
-                  }); //aca retornaria el token
+                    token: cliente.remember_token
+                  }); 
                 else res.status(401).send('Contraseña incorrecta');
             })
     });
@@ -69,17 +71,19 @@ const addClientes = (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', '*');
 
     const {dni, nombre_completo, telefono, direccion, ciudad, email, password } = req.body;
-    const hash = bcrypt.hashSync(password.toString(), 10);
         
-    pool.query(queries.getClientesByEmail, [email], (error, results)=> {
+    pool.query(queries.getClientesByEmail, [email.toLowerCase()], (error, results)=> {
         if (results.rows.length){
             res.status(401).send("Existe un cliente con este email");
         } 
         else {
 
+            const hash = bcrypt.hashSync(password.toString(), 10);
+            const token=(Math.random() + 1).toString(36).substring(7);
+
             pool.query(
                 queries.addClientes,
-                [dni, nombre_completo, telefono, direccion, ciudad, email, hash, null, new Date(),new Date()],
+                [dni, nombre_completo, telefono, direccion, ciudad, email.toLowerCase(), hash, token, new Date(),new Date()],
                 (error, results)=>{
                     if (error) throw error;
                     res.status(200).send("Cliente agregado exitosamente");
@@ -122,7 +126,7 @@ const updateCliente = (req, res) => {
             res.status(401).send("No existe Cliente con ese id");
         }
         else{
-                pool.query(queries.updateCliente,[dni, nombre_completo, telefono, direccion, ciudad, email, hash, new Date(), id],(error, results)=>{
+                pool.query(queries.updateCliente,[dni, nombre_completo, telefono, direccion, ciudad, email.toLowerCase(), hash, new Date(), id],(error, results)=>{
                     if (error) throw error;
                     res.status(200).send("Cliente actualizado exitosamente");
                 });
