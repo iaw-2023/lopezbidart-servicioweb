@@ -1,4 +1,3 @@
-const { DatabaseError } = require('pg/lib');
 const pool = require('../../db');
 const queries= require('../queries/detallesQueries');
 const queriesPedidos= require('../queries/pedidosQueries');

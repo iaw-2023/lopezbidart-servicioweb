@@ -1,4 +1,3 @@
-const { token } = require('morgan');
 const pool = require('../../db');
 const queries= require('../queries/clientesQueries');
 const bcrypt = require("bcrypt");

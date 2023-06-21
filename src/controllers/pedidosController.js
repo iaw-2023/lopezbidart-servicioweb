@@ -43,25 +43,10 @@ const addPedido = (req, res) => {
     });
 };
 
-const pagoPedido = (req, res) => {
-
-    mercadopago.payment.save(req.body).then(function(response) {
-        const { status, status_detail, id } = response.body;
-        res.status(response.status).json({ status, status_detail, id });
-    })
-    .catch(function(error) {
-        console.error(error);
-    });
-
-    //Aca agregaria el pedido y los detalles...
-    
-};
 
 
 module.exports = {
     getPedidosByIdCliente,
     getPedidosById,
-    addPedido,
-    pagoPedido
-    
+    addPedido
 };

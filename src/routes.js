@@ -9,9 +9,6 @@ const detallesController= require('./controllers/detallesController');
 const pagoController= require("./controllers/pagoController");
 const router=Router();
 
-
-router.post("/payment", pagoController.postPago);
-
 /**
  * @swagger 
  * components:
@@ -844,6 +841,46 @@ router.get("/detalle/:id_pedido", detallesController.getDetallesById);
  *              description: Nuevo detalle creado
  */
 router.post("/detalle", detallesController.addDetalle);
+
+/**
+ * @swagger 
+ * components:
+ *  schemas:
+ *      Pago:
+ *          type: object
+ *          properties:
+ *              cliente:
+ *                type: object
+ *                description: Datos del cliente
+ *              compra:
+ *                type: object
+ *                description: Datos de la compra
+ *          required:
+ *              -cliente
+ *              -compra
+ *          example:
+ *              cliente: {id: 1,email: lopezbidart@hotmail.com}
+ *              compra: {0: {cantidad: 1, costo: 1000, detalle: Cortina roller Black Out},
+ *                       1: {cantidad: 1, costo: 5000, detalle: Cortina roller Sun screen}}
+ */
+/**
+ * @swagger
+ * /api/payment:
+ *  post:
+ *      summary: Pago acceptado
+ *      tags: [Pago]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/Pago'
+ *      responses:
+ *          200:
+ *              description: Pago acceptado
+ */
+router.post("/payment", pagoController.postPago);
 
 module.exports = router;
 
