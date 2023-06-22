@@ -5,6 +5,33 @@ const mercadopago=require("mercadopago");
 require("dotenv").config();
 mercadopago.configure({access_token: process.env.ACCESS_TOKEN})
 
+const getFeedback= (req, res) => {
+    console.log(req.query.status);
+    console.log(req.query);
+    console.log(req.query);
+
+    /* me da todo esto.. Igual deberia tener una variable guardada por las dudas.. si esta aprobado hago el post y sino la borro
+  collection_id: '1315882437',
+  collection_status: 'approved',
+  payment_id: '1315882437',
+  status: 'approved',
+  external_reference: 'null',
+  payment_type: 'credit_card',
+  merchant_order_id: '9976225706',
+  preference_id: '159930080-9ce80350-902c-48f7-b9aa-39d176479a70',
+  site_id: 'MLA',
+  processing_mode: 'aggregator',
+  merchant_account_id: 'null'
+  payment_id: '1315882437',
+  status: 'approved',
+  external_reference: 'null',
+  payment_type: 'credit_card',
+  merchant_order_id: '9976225706',
+  preference_id: '159930080-9ce80350-902c-48f7-b9aa-39d176479a70',
+  site_id: 'MLA', */
+    res.location('http://localhost:3000/Carrito');
+    
+}
 
 const postPago= (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', '*');
@@ -34,7 +61,7 @@ const postPago= (req, res) => {
               email: cliente.email,
             },
             back_urls: {
-                success: 'https://lopezbidart-react.vercel.app/home', 
+                success: 'http://localhost:5000/api/feedback', 
                 pending: '', 
                 failure: '', 
             },
@@ -42,11 +69,14 @@ const postPago= (req, res) => {
             binary_mode: true,
     };
 
-    mercadopago.preferences.create(preference).then((response)=>res.status(201).send({response})).catch((error)=>res.status(400).send({error: error.message}));
-     
-};
+    mercadopago.preferences.create(preference)
+        .then((response)=>res.status(201).send({response})).catch((error)=>res.status(400).send({error: error.message}));
+    
+            
+};  
  
 
 module.exports = {
-    postPago
+    postPago,
+    getFeedback
 };

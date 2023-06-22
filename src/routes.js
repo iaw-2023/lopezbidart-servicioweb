@@ -877,10 +877,12 @@ router.post("/detalle", detallesController.addDetalle);
  *                      type: object
  *                      $ref: '#/components/schemas/Pago'
  *      responses:
- *          200:
+ *          201:
  *              description: Pago acceptado
  */
 router.post("/payment", pagoController.postPago);
+
+router.get("/feedback", pagoController.getFeedback);
 
 module.exports = router;
 
