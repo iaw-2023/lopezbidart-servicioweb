@@ -4,7 +4,7 @@ const queries= require('../queries/pedidosQueries');
 const queriesClientes= require('../queries/clientesQueries');
 const queriesDetalles= require('../queries/detallesQueries');
 
-
+//Metodo para uso interno
 const getPedidosById= (req, res) => {
     const id= parseInt(req.params.id);
     pool.query(queries.getPedidosById,[id], (error, results)=>{
@@ -37,9 +37,7 @@ const getPedidosByIdCliente = async (req, res) => {
 
 const addPedido = async (req, res) => {
     const { id_cliente, fecha, costo_final } = req.body;
-    console.log(id_cliente);
     pool.query(queriesClientes.getClientesById, [id_cliente], (error, results) => {
-      console.log(results);
       if (error) {
         console.error(error);
         res.status(500).send("Error al consultar la base de datos");
@@ -64,6 +62,7 @@ const addPedido = async (req, res) => {
     });
 };
 
+//Metodo para uso interno
 const addPedidoDetalles = async (req, res) => {
   const { id_cliente, fecha, costo_final } = req.body.pedido;
   const detalles = req.body.detalle;
