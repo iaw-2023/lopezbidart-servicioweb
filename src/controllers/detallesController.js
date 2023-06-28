@@ -12,7 +12,7 @@ const getDetallesById= (req, res) => {
 };
 
 
-const addDetalle = (req, res) => {
+const addDetalle = async (req, res) => {
     
     const {id_pedido, producto , cantidad, costo_detalle } = req.body;
         
@@ -33,6 +33,9 @@ const addDetalle = (req, res) => {
         }
     });
 };
+
+
+
 
 module.exports = {
     getDetallesById,

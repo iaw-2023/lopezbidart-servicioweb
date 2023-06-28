@@ -1,82 +1,188 @@
 const morgan = require('morgan');
-const pool = require('../../db');
-const mercadopago=require("mercadopago");
-//Para que acepte la variable de entorno
+const mercadopago = require("mercadopago");
+const pedidosController= require('./pedidosController');
+
+
+
+// Para aceptar la variable de entorno
 require("dotenv").config();
-mercadopago.configure({access_token: process.env.ACCESS_TOKEN})
+mercadopago.configure({ access_token: process.env.ACCESS_TOKEN });
 
-const getFeedback= (req, res) => {
-    console.log(req.query.status);
-    console.log(req.query);
-    console.log(req.query);
+/*
 
-    /* me da todo esto.. Igual deberia tener una variable guardada por las dudas.. si esta aprobado hago el post y sino la borro
-  collection_id: '1315882437',
-  collection_status: 'approved',
-  payment_id: '1315882437',
-  status: 'approved',
-  external_reference: 'null',
-  payment_type: 'credit_card',
-  merchant_order_id: '9976225706',
-  preference_id: '159930080-9ce80350-902c-48f7-b9aa-39d176479a70',
-  site_id: 'MLA',
-  processing_mode: 'aggregator',
-  merchant_account_id: 'null'
-  payment_id: '1315882437',
-  status: 'approved',
-  external_reference: 'null',
-  payment_type: 'credit_card',
-  merchant_order_id: '9976225706',
-  preference_id: '159930080-9ce80350-902c-48f7-b9aa-39d176479a70',
-  site_id: 'MLA', */
-    res.location('http://localhost:3000/Carrito');
-    
-}
+mercadopago.configure({
+		access_token: ACCESS_TOKEN,
+		access_control_allow_origin: '*',
+		access_control_allow_methods: 'GET, POST',
+		access_control_allow_headers: 'Authorization, Content-Type',
+});
+*/
+//let pedido = {};
+//let detalles = [];
 
-const postPago= (req, res) => {
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
- 
-    const {cliente, compra} = req.body;
+// Para que se ejecute solo una vez el post del pedido
+let paymentAux = 0;
 
-    const productos = [];
-    
-    for (let i in compra) {
-        productos[i]={
-            id: i,
-            title: 'Cortina Roller',
-            currency_id: 'ARS',
-            picture_url: 'https://i.ibb.co/hRKpTbP/logo-png.png',
-            description:  compra[i].detalle,
-            category_id: 'art',
-            quantity: parseInt(compra[i].cantidad),
-            unit_price: parseInt(compra[i].costo),
-        }
+const getFeedback = async (req, res) => {
+
+  const { query } = req;
+  const topic = query.topic || query.type;
+
+  if (topic === "payment") {
+    const paymentId = query.id || query['data.id'];
+    if(paymentAux != paymentId) {
+      paymentAux = paymentId;
+    mercadopago.payment.capture(paymentId, mercadopago, (error, response) => {
+      if (error){
+          console.log(error);
+      }else{
+          if( response.body.status === 'approved') {
+              
+              //console.log(paymentId);
+              //el metodo anda bien probar si imprime...
+              //otro dato, sin ningun if, parece que se agrego un solo pedido y los detalles, verificar eso...
+              pedidosController.addPedidoDetalles({ body: { pedido: this.pedido, detalle: this.detalles } }, res);
+
+          } else {
+              pedido = {};
+              detalles.length = 0;
+          }
+          
+      }
+    });
     }
-    
-    let preference = {
-            // declaramos las preferencias de pago
-            items: productos,
-            payer: { 
-              email: cliente.email,
-            },
-            back_urls: {
-                success: 'http://localhost:5000/api/feedback', 
-                pending: '', 
-                failure: '', 
-            },
-            auto_return:'approved',
-            binary_mode: true,
-    };
+  }
 
-    mercadopago.preferences.create(preference)
-        .then((response)=>res.status(201).send({response})).catch((error)=>res.status(400).send({error: error.message}));
+};
+
+
+
+const postFeedback = (req, res) => {      
+  
+  //console.log('entre');
+  const { query } = req;
+  //console.log(query);
+  const topic = query.topic || query.type;
+
+  if (topic === "payment") {
+    const paymentId = query.id || query['data.id'];
+    if(paymentAux != paymentId) {
+      paymentAux = paymentId;
+    mercadopago.payment.capture(paymentId, mercadopago, (error, response) => {
+      if (error){
+          console.log(error);
+      }else{
+          if( response.body.status === 'approved') {
+              
+              //console.log(response);
+              //console.log(response.body.additional_info.items);
+              let compra = response.body.additional_info.items;
+              let pedido = {};
+              let detalles = [];
+              let costoTotal = 0;
+              let cliente_id = parseInt(compra[0].id);
+              const fecha = new Date(Date.now());
+
+              for (let i in compra) {
+                
+
+                costoTotal += (parseInt(compra[i].unit_price)*parseInt(compra[i].quantity));
+
+                const nuevoDetalle = {
+                  producto: compra[i].description,
+                  cantidad: parseInt(compra[i].quantity),
+                  costo_detalle: (parseInt(compra[i].quantity)*parseInt(compra[i].unit_price)),
+                };
+
+                detalles.push(nuevoDetalle);
+              }
+
+              pedido = {
+                id_cliente: cliente_id,
+                fecha: fecha,
+                costo_final: costoTotal,
+              };
+
+              //console.log(pedido);
+              //console.log(detalles);
+              pedidosController.addPedidoDetalles({ body: { pedido: pedido, detalle: detalles } }, res);
+
+          }
+          
+      }
+    });
+    }
+  }
+
+};
+
+const postPago = (req, res) => {
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Methods', '*');
+
+  //const fecha = new Date(Date.now());
+  const { cliente, compra } = req.body;
+
+  const productos = [];
+  //let costoTotal = 0;
+
+  for (let i in compra) {
+    productos[i] = {
+      id: cliente.id,
+      title: 'Cortina Roller',
+      currency_id: 'ARS',
+      picture_url: 'https://i.ibb.co/hRKpTbP/logo-png.png',
+      description: compra[i].detalle,
+      category_id: 'art',
+      quantity: parseInt(compra[i].cantidad),
+      unit_price: parseInt(compra[i].costo),
+    };
+/*
+    costoTotal += compra[i].costo;
+
+    const nuevoDetalle = {
+      id_pedido:0,
+      producto: compra[i].detalle,
+      cantidad: parseInt(compra[i].cantidad),
+      costo_detalle: parseInt(compra[i].costo) * parseInt(compra[i].cantidad),
+    };
+*/
+    //detalles.push(nuevoDetalle);
+  }
+/*
+  pedido = {
+    id_cliente: cliente.id,
+    fecha: fecha,
+    costo_final: costoTotal,
+  };*/
+  //console.log(pedido);
+  let preference = {
+    // Declaramos las preferencias de pago
+    items: productos,
+    payer: {
+      email: cliente.email,
+    },
+    notification_url:'https://lopez-bidart-servicio-web-nacholb22.vercel.app/api/feedback',
+    //purpose: 'wallet_purchase',
+    back_urls: {
+      success: '',
+      pending: '',
+      failure: '',
+    },
+    binary_mode: true,
+  };
+
     
-            
-};  
- 
+  
+    mercadopago.preferences.create(preference)
+    .then((response) => res.status(201).send({ response }))
+    .catch((error) => res.status(400).send({ error: error.message }));
+
+    
+};
 
 module.exports = {
-    postPago,
-    getFeedback
+  postPago,
+  postFeedback,
+  getFeedback
 };

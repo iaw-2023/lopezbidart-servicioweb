@@ -769,6 +769,25 @@ router.get("/pedido/:id_cliente", pedidosController.getPedidosByIdCliente);
 router.post("/pedido", pedidosController.addPedido);
 
 /**
+ * @swagger
+ * /api/pedidoDetalles:
+ *  post:
+ *      summary: Crea un nuevo pedido
+ *      tags: [Pedido]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/Pedido'
+ *      responses:
+ *          200:
+ *              description: Nuevo pedido creado
+ */
+router.post("/pedidoDetalles", pedidosController.addPedidoDetalles);
+
+/**
  * @swagger 
  * components:
  *  schemas:
@@ -794,7 +813,7 @@ router.post("/pedido", pedidosController.addPedido);
  *              -costo_detalle
  *          example:
  *              id_pedido: 1
- *              producto: Cortina black out zacalo y cadena estandar
+ *              producto: Cortina black out, zocalo y cadena estandar
  *              cantidad: 2
  *              costo_detalle: 15000
  */
@@ -881,8 +900,27 @@ router.post("/detalle", detallesController.addDetalle);
  *              description: Pago acceptado
  */
 router.post("/payment", pagoController.postPago);
+/**
+ * @swagger
+ * /api/feedback:
+ *  post:
+ *      summary: Pago acceptado
+ *      tags: [Pago]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/Pago'
+ *      responses:
+ *          200:
+ *              description: Pago acceptado
+ */
+router.post("/feedback", pagoController.postFeedback);
 
-router.get("/feedback", pagoController.getFeedback);
+router.post("/datosPago", pagoController.getFeedback);
+
 
 module.exports = router;
 

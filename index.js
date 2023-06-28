@@ -8,6 +8,8 @@ const swaggerUI= require("swagger-ui-express");
 const swaggerJsDoc= require ("swagger-jsdoc");
 const PORT = (5000);
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const bodyParser = require('body-parser');
+
 //morgan?
 
 //var mercadopago = require('mercadopago');
@@ -32,8 +34,10 @@ const swaggerSpec= {
 };
 
 //para problemas de cors
+
 app.options('*', cors());
 app.use(cors());
+app.use(bodyParser.json());
 //para recibir jsons
 app.use(express.json());
 

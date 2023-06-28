@@ -33,6 +33,7 @@ const getClientesById= (req, res) => {
     });
 };
 
+
 const getClientesByEmail= (req, res) => {
     const email= req.params.param;
     pool.query(queries.getClientesByEmail,[email.toLowerCase()], (error, results)=>{
@@ -40,7 +41,7 @@ const getClientesByEmail= (req, res) => {
         res.status(200).json(results.rows);
     });
 };
-  
+
 
 const postLogin= (req, res) => {
    res.setHeader('Access-Control-Allow-Headers', '*');
@@ -49,13 +50,14 @@ const postLogin= (req, res) => {
     const {email, password } = req.body;
 
     pool.query(queries.getClientesByEmail, [email.toLowerCase()], (error, results)=> {
-        if (error) throw error;
+            if (error) throw error;
             if (!results.rows.length){
                 res.status(404).send('Email no registrado');
             }    
             const cliente = results.rows[0];   
             return  bcrypt.compare(password, cliente.password).then(resul => {
                 if (resul == true ) return res.status(200).send({
+                    id: cliente.id,
                     token: cliente.remember_token
                   }); 
                 else res.status(401).send('Contraseña incorrecta');
@@ -111,8 +113,6 @@ const removeCliente = (req, res) => {
 };
 
 const updateCliente = (req, res) => {
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
 
     const id= parseInt(req.params.id);
     const {dni, nombre_completo, telefono, direccion, ciudad, email, password} = req.body;    
