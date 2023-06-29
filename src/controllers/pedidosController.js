@@ -13,26 +13,13 @@ const getPedidosById= (req, res) => {
     });
 };
 
-const getPedidosByIdCliente = async (req, res) => {
-    const id_cliente = parseInt(req);
-    console.log("estoy en get pedidos:", id_cliente);
-    try {
-      const results = await new Promise((resolve, reject) => {
-        pool.query(queries.getPedidosByIdCliente, [id_cliente], (error, results) => {
-          if (error) {
-            console.error(error);
-            reject(error);
-          } else {
-            resolve(results.rows);
-          }
-        });
-      });
-  
-      return results;
-    } catch (error) {
-      throw error;
-    }
-  };
+const getPedidosByIdCliente= (req, res) => {
+  const id_cliente= parseInt(req.params.id_cliente);
+  pool.query(queries.getPedidosByIdCliente,[id_cliente], (error, results)=>{
+      if (error) throw error;
+      res.status(200).json(results.rows);
+  });
+};
   
 
 const addPedido = async (req, res) => {

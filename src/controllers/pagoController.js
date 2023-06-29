@@ -107,6 +107,5 @@ const postPago = (req, res) => {
 
 module.exports = {
   postPago,
-  postFeedback,
-  getFeedback
+  postFeedback
 };

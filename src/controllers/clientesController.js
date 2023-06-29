@@ -12,30 +12,16 @@ const getClientes= (req, res) => {
     });
 };
 
-const getClientesByParam= (req, res) => {
-    const param = parseInt(req.params.param);
-    if (isNaN(param)) {
-      // El parámetro es una cadena de texto (email)
-      getClientesByEmail(req, res);
-      
-    } else {
-      // El parámetro es un entero (ID)
-      getClientesById(req, res);
-    
-    }
-};
-
 const getClientesById= (req, res) => {
-    const id= parseInt(req.params.param);
+    const id= parseInt(req.params.id);
     pool.query(queries.getClientesById,[id], (error, results)=>{
         if (error) throw error;
         res.status(200).json(results.rows);
     });
 };
 
-
 const getClientesByEmail= (req, res) => {
-    const email= req.params.param;
+    const email= req.params.email;
     pool.query(queries.getClientesByEmail,[email.toLowerCase()], (error, results)=>{
         if (error) throw error;
         res.status(200).json(results.rows);
@@ -139,6 +125,7 @@ module.exports = {
     addClientes,
     removeCliente,
     updateCliente,
-    getClientesByParam,
-    postLogin
+    postLogin,
+    getClientesById,
+    getClientesByEmail
 };

@@ -74,15 +74,15 @@ router.get("/clientes", clientesController.getClientes);
 
 /**
  * @swagger
- * /api/clientes/{param}:
+ * /api/clientes/{id}:
  *  get:
- *      summary: Retorna un cliente por id o su email
+ *      summary: Retorna un cliente por id
  *      tags: [Cliente]
  *      parameters:
  *          - in: path
- *            name: id or email
+ *            name: id
  *            schema:
- *              type: string
+ *              type: integer
  *            required: true
  *            description: Id del Cliente
  *      responses:
@@ -96,8 +96,33 @@ router.get("/clientes", clientesController.getClientes);
  *          404:
  *              description: Cliente no encontrado 
  */
-router.get("/clientes/:param", clientesController.getClientesByParam);
+router.get("/clientes/:id", clientesController.getClientesById);
 
+/**
+ * @swagger
+ * /api/clientesEmail/{email}:
+ *  get:
+ *      summary: Retorna un cliente segun su email
+ *      tags: [Cliente]
+ *      parameters:
+ *          - in: path
+ *            name: email
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: Email del Cliente
+ *      responses:
+ *          200:
+ *              description: Cliente encontrado
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          $ref: '#/components/schemas/Cliente'
+ *          404:
+ *              description: Cliente no encontrado 
+ */
+router.get("/clientesEmail/:email", clientesController.getClientesByEmail);
 
 /**
  * @swagger
@@ -769,25 +794,6 @@ router.get("/pedido/:id_cliente", pedidosController.getPedidosByIdCliente);
 router.post("/pedido", pedidosController.addPedido);
 
 /**
- * @swagger
- * /api/pedidoDetalles:
- *  post:
- *      summary: Crea un nuevo pedido
- *      tags: [Pedido]
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      $ref: '#/components/schemas/Pedido'
- *      responses:
- *          200:
- *              description: Nuevo pedido creado
- */
-router.post("/pedidoDetalles", pedidosController.addPedidoDetalles);
-
-/**
  * @swagger 
  * components:
  *  schemas:
@@ -900,26 +906,8 @@ router.post("/detalle", detallesController.addDetalle);
  *              description: Pago acceptado
  */
 router.post("/payment", pagoController.postPago);
-/**
- * @swagger
- * /api/feedback:
- *  post:
- *      summary: Pago acceptado
- *      tags: [Pago]
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      $ref: '#/components/schemas/Pago'
- *      responses:
- *          200:
- *              description: Pago acceptado
- */
-router.post("/feedback", pagoController.postFeedback);
 
-router.post("/datosPago", pagoController.getFeedback);
+router.post("/feedback", pagoController.postFeedback);
 
 
 module.exports = router;
