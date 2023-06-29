@@ -1,4 +1,3 @@
-const { DatabaseError } = require('pg/lib');
 const pool = require('../../db');
 const queries= require('../queries/detallesQueries');
 const queriesPedidos= require('../queries/pedidosQueries');
@@ -13,7 +12,7 @@ const getDetallesById= (req, res) => {
 };
 
 
-const addDetalle = (req, res) => {
+const addDetalle = async (req, res) => {
     
     const {id_pedido, producto , cantidad, costo_detalle } = req.body;
         
@@ -34,6 +33,9 @@ const addDetalle = (req, res) => {
         }
     });
 };
+
+
+
 
 module.exports = {
     getDetallesById,

@@ -6,8 +6,14 @@ const app= express();
 const config = require('./config');
 const swaggerUI= require("swagger-ui-express");
 const swaggerJsDoc= require ("swagger-jsdoc");
-const PORT = (config.PORT);
+const PORT = (5000);
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const bodyParser = require('body-parser');
+
+//morgan?
+
+//var mercadopago = require('mercadopago');
+//mercadopago.configurations.setAccessToken("APP_USR-8894734259507762-061400-ee3cdd8bfc94e8439e137069bfc89fa6-159930080");
 
 //swagger
 const swaggerSpec= {
@@ -27,9 +33,12 @@ const swaggerSpec= {
     apis: [`${path.join(__dirname, "./src/routes.js")}`],
 };
 
+//para problemas de cors
 
 app.options('*', cors());
 app.use(cors());
+app.use(bodyParser.json());
+//para recibir jsons
 app.use(express.json());
 
 

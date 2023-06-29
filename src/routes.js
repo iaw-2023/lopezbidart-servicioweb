@@ -6,8 +6,7 @@ const coloresController= require('./controllers/coloresController');
 const clientesController= require('./controllers/clientesController');
 const pedidosController= require('./controllers/pedidosController');
 const detallesController= require('./controllers/detallesController');
-
-
+const pagoController= require("./controllers/pagoController");
 const router=Router();
 
 /**
@@ -75,15 +74,15 @@ router.get("/clientes", clientesController.getClientes);
 
 /**
  * @swagger
- * /api/clientes/{param}:
+ * /api/clientes/{id}:
  *  get:
- *      summary: Retorna un cliente por id o su email
+ *      summary: Retorna un cliente por id
  *      tags: [Cliente]
  *      parameters:
  *          - in: path
- *            name: id or email
+ *            name: id
  *            schema:
- *              type: string
+ *              type: integer
  *            required: true
  *            description: Id del Cliente
  *      responses:
@@ -97,8 +96,33 @@ router.get("/clientes", clientesController.getClientes);
  *          404:
  *              description: Cliente no encontrado 
  */
-router.get("/clientes/:param", clientesController.getClientesByParam);
+router.get("/clientes/:id", clientesController.getClientesById);
 
+/**
+ * @swagger
+ * /api/clientesEmail/{email}:
+ *  get:
+ *      summary: Retorna un cliente segun su email
+ *      tags: [Cliente]
+ *      parameters:
+ *          - in: path
+ *            name: email
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: Email del Cliente
+ *      responses:
+ *          200:
+ *              description: Cliente encontrado
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          $ref: '#/components/schemas/Cliente'
+ *          404:
+ *              description: Cliente no encontrado 
+ */
+router.get("/clientesEmail/:email", clientesController.getClientesByEmail);
 
 /**
  * @swagger
@@ -795,7 +819,7 @@ router.post("/pedido", pedidosController.addPedido);
  *              -costo_detalle
  *          example:
  *              id_pedido: 1
- *              producto: Cortina black out zacalo y cadena estandar
+ *              producto: Cortina black out, zocalo y cadena estandar
  *              cantidad: 2
  *              costo_detalle: 15000
  */
@@ -842,6 +866,49 @@ router.get("/detalle/:id_pedido", detallesController.getDetallesById);
  *              description: Nuevo detalle creado
  */
 router.post("/detalle", detallesController.addDetalle);
+
+/**
+ * @swagger 
+ * components:
+ *  schemas:
+ *      Pago:
+ *          type: object
+ *          properties:
+ *              cliente:
+ *                type: object
+ *                description: Datos del cliente
+ *              compra:
+ *                type: object
+ *                description: Datos de la compra
+ *          required:
+ *              -cliente
+ *              -compra
+ *          example:
+ *              cliente: {id: 1,email: lopezbidart@hotmail.com}
+ *              compra: {0: {cantidad: 1, costo: 1000, detalle: Cortina roller Black Out},
+ *                       1: {cantidad: 1, costo: 5000, detalle: Cortina roller Sun screen}}
+ */
+/**
+ * @swagger
+ * /api/payment:
+ *  post:
+ *      summary: Pago acceptado
+ *      tags: [Pago]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/Pago'
+ *      responses:
+ *          201:
+ *              description: Pago acceptado
+ */
+router.post("/payment", pagoController.postPago);
+
+router.post("/feedback", pagoController.postFeedback);
+
 
 module.exports = router;
 

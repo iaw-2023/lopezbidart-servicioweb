@@ -1,14 +1,19 @@
-const { DatabaseError } = require('pg/lib');
 const pool = require('../../db');
 const queries= require('../queries/coloresQueries');
 
 
 const getColors= (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+
     pool.query(queries.getColors, (error, results)=>{
         if (error) throw error;
+        else
         res.status(200).json(results.rows);
 
     });
+    
 };
 
 const getColorsById= (req, res) => {
